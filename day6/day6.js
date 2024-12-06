@@ -1,85 +1,81 @@
-let input = `....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#...`;
+let input = require("./day6Input.js");
 
-let map = input.split("\n");
+//input = `....#.....
+//.........#
+//..........
+//..#.......
+//.......#..
+//..........
+//.#..^.....
+//........#.
+//#.........
+//......#...`;
 
-const getFront = (row, col, orientation) => {
-  if (orientation === "^") {
-    return [row - 1 >= 0 && row - 1, col];
-  }
+let map = input.split("\n").map((line) => line.split(""));
 
-  if (orientation === "v") {
-    return [row + 1 < map.length && row + 1, col];
-  }
+const move = (row, col) => {
+  while (true) {
+    // move up until border or #
+    for (row; map[row][col] !== "#" && row >= 0; row--) {
+      map[row][col] = "X";
+    }
 
-  if (orientation === ">") {
-    return [row, col + 1 < map[row].length && col + 1];
-  }
+    // if is border, break, else goes back 1
+    if (row < 0) {
+      return;
+    }
+    row++;
 
-  return [row, col - 1 >= 0 && col - 1];
-};
+    // move right until border or #
+    for (col; col < map[row].length && map[row][col] !== "#"; col++) {
+      map[row][col] = "X";
+    }
 
-const turnRight = (orientation) => {
-  if (orientation === "^") return ">";
-  if (orientation === ">") return "v";
-  if (orientation === "v") return "<";
-  return "^";
-};
+    //if is border, break, else goes back 1
+    if (col >= map[row].length) {
+      return;
+    }
+    col--;
 
-const move = (previous, nextRow, newCol, orientation) => {
-  if (nextRow === false || newCol === false) {
-    return;
-  }
+    // move down until border or #
+    for (row; row < map.length && map[row][col] !== "#"; row++) {
+      map[row][col] = "X";
+    }
 
-  //console.log(previous);
-  //console.log(nextRow, newCol, orientation);
+    //if is border, break, else goes back 1
+    if (row >= map.length) {
+      return;
+    }
+    row--;
 
-  if (map[nextRow][newCol] === "#") {
-    orientation = turnRight(orientation);
-    move(
-      previous,
-      ...getFront(previous[0], previous[1], orientation),
-      orientation
-    );
-  } else {
-    let line = map[nextRow];
-    map[nextRow] = line.substring(0, newCol) + "X" + line.substring(newCol + 1);
-    move(
-      [nextRow, newCol],
-      ...getFront(nextRow, newCol, orientation),
-      orientation
-    );
+    // move left until border or #
+    for (col; map[row][col] !== "#" && col >= 0; col--) {
+      map[row][col] = "X";
+    }
+
+    //if is border, break, else goes back 1
+    if (col < 0) {
+      return;
+    }
+    col++;
   }
 };
 
 for (let row = 0; row < map.length; row++) {
-  let orientation =
-    map[row][map[row].indexOf("^")] ||
-    map[row][map[row].indexOf("v")] ||
-    map[row][map[row].indexOf("<")] ||
-    map[row][map[row].indexOf(">")];
+  let orientation = map[row][map[row].indexOf("^")];
 
   if (orientation) {
     let col = map[row].indexOf(orientation);
 
     console.log("start: " + row + " " + col, "orientation: " + orientation);
 
-    map[row] = map[row].replace(orientation, "X");
-    move([row, col], ...getFront(row, col, orientation), orientation);
+    move(row, col);
     break;
   }
 }
 
 let total = map.reduce((acc, next) => {
-  return acc + next.split("").filter((ch) => ch === "X").length;
+  return acc + next.filter((ch) => ch === "X").length;
 }, 0);
 
 console.log(total);
