@@ -79,3 +79,14 @@ let total = map.reduce((acc, next) => {
 }, 0);
 
 console.log(total);
+
+//....#.....
+//....XXXXX#
+//....X...X.
+//..#.X...X.
+//..XXXXX#X.
+//..X.X.X.X.
+//.#XX^XXXX.
+//.XXXXXXX#.
+//#XXXXXXX..
+//......#X..
